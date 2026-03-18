@@ -49,7 +49,6 @@ def decrypt_apriltag(tag_value):
         "order": order,
         "x": x,
         "y": y,
-        "A_value": A # Included for debugging purposes
     }
 
 scanned_tag = 5194 
