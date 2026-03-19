@@ -29,7 +29,16 @@ def decrypt_apriltag(tag_value):
         A = ((p_swap * 3) + K) % 8750
         
     elif k == 2:
-        pass
+        K = 2718
+
+        # Extract payload 
+        payload = tag_str[1:]   
+        # Reverse payload and convert to integer   
+        p_comp = 9999 - int(payload) 
+
+        # Calculate A 
+        A = ((p_comp * 9) + K) % 8750
+        
     elif k == 3:
         pass
     elif k == 4:
@@ -75,3 +84,4 @@ print(result)
 scanned_tag = 16722
 result = decrypt_apriltag(scanned_tag)
 print(result)
+
