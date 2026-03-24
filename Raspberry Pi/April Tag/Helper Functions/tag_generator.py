@@ -1,8 +1,7 @@
-import json
 import random
-import csv
 
 def decrypt_apriltag(tag_value):
+    # Convert input to a string and pad with zeros in front to get 5 digit value
     tag_str = str(tag_value).zfill(5)
     k = int(tag_str[0])
 
@@ -40,65 +39,65 @@ def decrypt_apriltag(tag_value):
     y = remainder % 25
             
     if not (1 <= order <= 14) or not (0 <= x <= 24) or not (0 <= y <= 24):
-        return None # Return None instead of erroring since we know the tags are mostly valid
+        raise ValueError()
         
     return {"order": order, "x": x, "y": y, "key": k}
 
 
-def generate_set_from_json(json_filename="tags_grouped_by_order.json"):
-    print(f"1. Loading pre-sorted tags from {json_filename}...")
-    
-    # Load the JSON data
-    try:
-        with open(json_filename, "r") as file:
-            raw_tags_by_order = json.load(file)
-    except FileNotFoundError:
-        print(f"Error: Could not find '{json_filename}'. Make sure it's in the same folder.")
-        return
-
-    # Prepare our usable dictionary by quickly decoding the loaded tags to get X, Y, and Key ID
+def generate_unique_tag_set():
+    print("1. Scanning and grouping all valid tags (0 - 48713)...")
     tags_by_order = {i: [] for i in range(1, 15)}
     
-    for order_str, tag_list in raw_tags_by_order.items():
-        order_int = int(order_str)
-        for tag_value in tag_list:
+    # Pre-calculate and group all valid tags up to 48713
+    for tag_value in range(48714):
+        try:
             result = decrypt_apriltag(tag_value)
-            if result:
+            if result and 1 <= result["order"] <= 14:
+                # Store the tag along with its decoded data
                 result["tag"] = tag_value 
-                tags_by_order[order_int].append(result)
+                tags_by_order[result["order"]].append(result)
+        except ValueError:
+            pass
 
-    # Shuffle the tags to ensure a random output every time
+    # Shuffle the tags within each order to ensure a random output every time
     for order in tags_by_order:
         random.shuffle(tags_by_order[order])
 
     print("2. Searching for a set with unique X/Y coordinates and balanced Key IDs...")
     
+    # Backtracking function to find a valid combination
     def solve(current_order, used_x, used_y, key_counts, current_selection):
+        # Base case: We successfully found 14 tags!
         if current_order > 14:
             return current_selection
 
+        # Try every tag in the current order group
         for item in tags_by_order[current_order]:
             x, y, k = item["x"], item["y"], item["key"]
 
-            # Constraints: Unique X, Unique Y, Max 3 of the same Key ID
+            # Check our constraints: Unique X, Unique Y, and Max 3 of the same Key ID
             if x not in used_x and y not in used_y and key_counts[k] < 3:
                 
+                # Make a choice
                 used_x.add(x)
                 used_y.add(y)
                 key_counts[k] += 1
                 current_selection.append(item)
 
+                # Move to the next order
                 result = solve(current_order + 1, used_x, used_y, key_counts, current_selection)
                 if result is not None:
-                    return result 
+                    return result # Success! Bubble up the answer.
 
+                # Undo the choice (Backtrack) if it led to a dead end
                 used_x.remove(x)
                 used_y.remove(y)
                 key_counts[k] -= 1
                 current_selection.pop()
 
-        return None 
+        return None # No valid combination found on this path
 
+    # Initialize tracking variables and start the solver at Order 1
     key_counts = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
     final_set = solve(1, set(), set(), key_counts, [])
 
@@ -109,18 +108,17 @@ def generate_set_from_json(json_filename="tags_grouped_by_order.json"):
         for item in final_set:
             print(f"{item['order']:<6} | {item['tag']:<8} | {item['key']:<4} | {item['x']:<4} | {item['y']:<4}")
         
-        # Export to CSV
-        csv_filename = "final_apriltag_set.csv"
-        with open(csv_filename, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Order", "Tag ID", "Key ID", "X", "Y"])
-            for item in final_set:
-                writer.writerow([item['order'], item['tag'], item['key'], item['x'], item['y']])
-        
-        print(f"\nSaved successfully to: {csv_filename}")
+        print("\nKey ID Distribution:")
+        for k, count in key_counts.items():
+            print(f"Key {k}: {count} tags")
+            
+        # Return the data so visualize_tags.py can use it
+        return final_set 
     else:
         print("Failed to find a combination that satisfies all rules.")
+        return None
+
 
 if __name__ == "__main__":
-    # Make sure the filename matches what you generated previously!
-    generate_set_from_json("tags_grouped_by_order.json")
+    # If you run this file directly, it will just print the results to the terminal
+    generate_unique_tag_set()
