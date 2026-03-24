@@ -1,3 +1,5 @@
+import json
+
 def decrypt_apriltag(tag_value):
     # Convert input to a string and pad with zeros in front to get 5 digit value
     tag_str = str(tag_value).zfill(5)
@@ -40,9 +42,28 @@ def decrypt_apriltag(tag_value):
         A = ((p_comp * 9) + K) % 8750
         
     elif k == 3:
-        pass
+        K = 8080
+
+        # Extract payload 
+        payload = tag_str[1:]   
+        # Reverse payload and convert to integer   
+        p_int = int(payload[-1] + payload[1:3] + payload[0]) 
+
+
+        # Calculate A 
+        A = ((p_int * 11) + K) % 8750
+        
     elif k == 4:
-        pass
+        K = 4040
+
+        # Extract payload 
+        payload = tag_str[1:]   
+        # Reverse payload and convert to integer   
+        graycode = int(payload) ^ (int(payload) // 2)
+
+        # Calculate A 
+        A = graycode ^ K
+        
     else:
         print("Invalid tag_value: Key ID must be between 0 and 4.")
         return None
@@ -69,19 +90,42 @@ def decrypt_apriltag(tag_value):
         "y": y,
     }
 
-scanned_tag = 5194 
-result = decrypt_apriltag(scanned_tag)
-print(result)
+def group_tags_by_order():
+    # Initialize a dictionary with keys 1 through 14 mapped to empty lists
+    tags_by_order = {i: [] for i in range(1, 15)}
+    
+    print("Scanning tags from 0 to 48713...")
+    
+    # Loop through 0 - 48713
+    for tag_value in range(48714):
+        try:
+            result = decrypt_apriltag(tag_value)
+            
+            # Check if result is valid and order falls between 1 and 14
+            if result is not None and 1 <= result["order"] <= 14:
+                tags_by_order[result["order"]].append(tag_value)
+                
+        except ValueError:
+            pass
 
-scanned_tag = 2893 
-result = decrypt_apriltag(scanned_tag)
-print(result)
+    # Print a summary of the dictionary to the terminal
+    print("\n--- Summary of Dictionary ---")
+    total_valid = 0
+    for order_num, tags in tags_by_order.items():
+        count = len(tags)
+        total_valid += count
+        print(f"Order {order_num}: {count} valid tags")
+        
+    print(f"\nTotal Valid Tags Found: {total_valid}")
 
-scanned_tag = 18862
-result = decrypt_apriltag(scanned_tag)
-print(result)
+    # Export the dictionary to a JSON file
+    output_filename = "tags_grouped_by_order.json"
+    with open(output_filename, "w") as file:
+        json.dump(tags_by_order, file, indent=4)
+        
+    print(f"\nSuccess! Full dictionary saved to: {output_filename}")
 
-scanned_tag = 16722
-result = decrypt_apriltag(scanned_tag)
-print(result)
+
+if __name__ == "__main__":
+    group_tags_by_order()
 
