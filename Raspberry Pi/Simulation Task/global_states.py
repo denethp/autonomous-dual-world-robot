@@ -1,0 +1,21 @@
+# Stores all variables used across modules
+
+# Network Configuration
+API_IP = "10.188.201.205" # SIMULATING PC'S IP ADDRESS
+API_BASE = f"http://{API_IP}:8000"
+
+CELL_SIZE = 0.4
+CURRENT_CELL = None
+CURRENT_X = None
+CURRENT_Y = None
+CURRENT_HEADING = None
+
+NUM_SEGMENTS = 7
+TOP_CROP_RATIO = 0.25 
+SIDE_CROP_RATIO = 0.35
+MIN_AREA_THRESHOLD = 50
+
+GRID_CENTER_REFERENCE_Y = None
+MOVE_RELATIVE_REFERENCE_Y = None
+
+
