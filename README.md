@@ -6,6 +6,8 @@ The robot acts as a **master controller** for a networked **virtual "slave" robo
 
 📺 **Demo video:** [Watch on YouTube](https://youtu.be/dummy-demo-link)
 
+[![Watch the demo](https://img.youtube.com/vi/xlX__w1153E/maxresdefault.jpg)](https://youtu.be/xlX__w1153E)
+
 **Team:** PRISM — University of Moratuwa
 **Category:** University Category
 **Competition period:** Dec 2025 – Mar 2026
