@@ -4,7 +4,7 @@ Autonomous physical robot built for the **Sri Lankan Robotics Challenge (SLRC) 2
 
 The robot acts as a **master controller** for a networked **virtual "slave" robot (Ares)**, coordinating maze navigation, computer-vision-based tag decoding, contactless object manipulation, and real-time closed-loop control of a simulated environment — entirely autonomously, with no remote control of any kind.
 
-📺 **Demo video:** [Watch on YouTube](https://youtu.be/dummy-demo-link)
+📺 **Demo video:** [Watch on YouTube](https://youtu.be/xlX__w1153E)
 
 [![Watch the demo](https://img.youtube.com/vi/xlX__w1153E/maxresdefault.jpg)](https://youtu.be/xlX__w1153E)
 
