@@ -188,7 +188,8 @@ The Mega and the gripper/slider Arduino communicate over a simple serial link:
 - Deneth Priyadarshana
 - Rumeth Samarasinghe
 - Piyumal Nuwarapaksha
-- *(plus additional contributors — see repository commit history)*
+- Sithum Peiris
+- Nilesh Amarathunga
 
 ## License
 
